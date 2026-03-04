@@ -51,7 +51,6 @@ uigen/prisma/dev.db
 uigen/prisma/dev.db-journal
 
 # configs
-uigen/.claude/
 uigen/.eslintrc.json
 
 uigen/package-lock.json
