@@ -1,0 +1,58 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+uigen/node_modules
+uigen/.pnp
+uigen/.pnp.*
+uigen/.yarn/*
+!uigen/.yarn/patches
+!uigen/.yarn/plugins
+!uigen/.yarn/releases
+!uigen/.yarn/versions
+
+# testing
+uigen/coverage
+
+# next.js
+uigen/.next/
+uigen/out/
+
+# production
+uigen/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+uigen/.env
+uigen/.env.local
+uigen/.env.development
+uigen/.env.production
+
+# vercel
+uigen/.vercel
+
+# typescript
+uigen/*.tsbuildinfo
+uigen/next-env.d.ts
+
+# generated files
+uigen/src/generated/prisma
+
+# database
+uigen/prisma/dev.db
+uigen/prisma/dev.db-journal
+
+# configs
+uigen/.claude/
+uigen/.eslintrc.json
+
+uigen/package-lock.json
+uigen/tsconfig.json
