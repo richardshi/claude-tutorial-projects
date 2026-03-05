@@ -38,6 +38,7 @@ jobs:
       contents: read
       pull-requests: write
       id-token: write
+emoving token)
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,7 +51,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}s
           github_token: ${{ secrets.GITHUB_TOKEN }}
           show_full_output: true
-          direct_prompt: |
+          prompt: |
             Please review this pull request. Analyze the changes and provide feedback on:
             - Code quality and best practices
             - Potential bugs or issues
