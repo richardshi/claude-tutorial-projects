@@ -15,8 +15,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if uigen changed
+        id: changes
+        run: |
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q '^uigen/'; then
+            echo "uigen=true" >> $GITHUB_OUTPUT
+          else
+            echo "uigen=false" >> $GITHUB_OUTPUT
+            echo "No uigen changes detected, skipping build."
+          fi
 
       - name: Setup Node.js
+        if: steps.changes.outputs.uigen == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -24,12 +37,15 @@ jobs:
           cache-dependency-path: uigen/package-lock.json
 
       - name: Install dependencies
+        if: steps.changes.outputs.uigen == 'true'
         run: npm ci
 
       - name: Generate Prisma client
+        if: steps.changes.outputs.uigen == 'true'
         run: npx prisma generate
 
       - name: Build
+        if: steps.changes.outputs.uigen == 'true'
         run: npm run build
 
   claude-review:
