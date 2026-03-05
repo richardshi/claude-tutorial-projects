@@ -1,0 +1,40 @@
+name: Claude Build Error Check
+
+on:
+  workflow_run:
+    workflows: ["Claude Code", "Claude Code PR Review"]
+    types: [completed]
+
+jobs:
+  claude-check:
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      actions: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Build Check
+        uses: anthropics/claude-code-action@v1.0.68
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          show_full_output: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            A GitHub Actions workflow has failed:
+            - Workflow: ${{ github.event.workflow_run.name }}
+            - Run ID: ${{ github.event.workflow_run.id }}
+            - Branch: ${{ github.event.workflow_run.head_branch }}
+            - Triggered by: ${{ github.event.workflow_run.event }}
+
+            Please use the mcp__github_ci tools to fetch the failed workflow run logs,
+            identify the root cause of the failure, and post a clear summary with
+            steps to fix it as a comment on the relevant PR or issue (if any).
+            If there is no associated PR, summarize the error in a new issue comment.
