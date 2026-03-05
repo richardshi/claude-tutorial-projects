@@ -53,8 +53,16 @@ jobs:
             The failed logs are in failed_logs.txt in the current directory.
 
             Steps:
-            1. Read failed_logs.txt to understand the failure.
-            2. Identify the root cause.
+            1. Read failed_logs.txt to identify the exact error and failing step.
+            2. Investigate the root cause by examining the source code — do not
+               just summarize the log. For example:
+               - If a module is missing: use Glob to find where it should exist,
+                 Grep to find where it is imported, Read the importing file
+               - If a type/compile error: Read the relevant source files
+               - If a config error: Read the relevant config files
             3. Post a comment on PR #${{ github.event.workflow_run.pull_requests[0].number }} using:
                gh pr comment ${{ github.event.workflow_run.pull_requests[0].number }} --repo richardshi/claude-tutorial-projects --body "..."
-               Include: what step failed, root cause, and concrete steps to fix it.
+               The comment must include:
+               - Which step failed and the exact error
+               - The true root cause found in the source code (not just the log)
+               - Precise steps to fix it (file names, commands, or code snippets)
