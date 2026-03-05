@@ -5,7 +5,6 @@ on:
     workflows: ["Claude Code", "Claude Code PR Review"]
     types: [completed]
 
-
 concurrency:
   group: claude-build-check
   cancel-in-progress: true
@@ -27,6 +26,17 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Fetch failed logs
+        id: fetch-logs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh run view ${{ github.event.workflow_run.id }} --log-failed \
+            --repo richardshi/claude-tutorial-projects 2>&1 | head -200 \
+            > /tmp/failed_logs.txt || true
+          echo "Fetched logs:"
+          cat /tmp/failed_logs.txt
+
       - name: Run Claude Build Check
         uses: anthropics/claude-code-action@v1.0.68
         env:
@@ -35,19 +45,18 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           show_full_output: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          allowed_tools: "Bash"
+          settings: '{"allowedTools": ["Bash(gh pr comment:*)", "Bash(gh issue comment:*)", "Read"]}'
           prompt: |
             A GitHub Actions workflow has failed:
             - Workflow: ${{ github.event.workflow_run.name }}
-            - Run ID: ${{ github.event.workflow_run.id }}
             - Branch: ${{ github.event.workflow_run.head_branch }}
-            - Triggered by: ${{ github.event.workflow_run.event }}
             - PR number: ${{ github.event.workflow_run.pull_requests[0].number }}
 
+            The failed logs have been saved to /tmp/failed_logs.txt.
+
             Steps:
-            1. Run `gh run view ${{ github.event.workflow_run.id }} --log-failed --repo richardshi/claude-tutorial-projects` to get the failure logs.
+            1. Read /tmp/failed_logs.txt to understand the failure.
             2. Identify the root cause.
-            3. Post a comment on PR #${{ github.event.workflow_run.pull_requests[0].number }} using:
-               `gh pr comment ${{ github.event.workflow_run.pull_requests[0].number }} --repo richardshi/claude-tutorial-projects --body "..."`
-               Include: what failed, why it failed, and concrete steps to fix it.
-            4. If the PR number is 0 or empty, post to a new issue comment instead.
+            3. Post a comment using:
+               gh pr comment ${{ github.event.workflow_run.pull_requests[0].number }} --repo richardshi/claude-tutorial-projects --body "COMMENT"
+               Include: what step failed, root cause, and concrete steps to fix it.
