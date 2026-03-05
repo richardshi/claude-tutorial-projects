@@ -52,4 +52,3 @@ uigen/prisma/dev.db-journal
 
 # configs
 uigen/.eslintrc.json
-uigen/tsconfig.json

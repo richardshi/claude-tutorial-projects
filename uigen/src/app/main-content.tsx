@@ -27,7 +27,6 @@ interface MainContentProps {
     data: any;
     createdAt: Date;
     updatedAt: Date;
-    brokenField: NonExistent; // intentional build break for workflow testing
   };
 }
 
