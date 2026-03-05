@@ -35,14 +35,19 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           show_full_output: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          allowed_tools: "Bash"
           prompt: |
             A GitHub Actions workflow has failed:
             - Workflow: ${{ github.event.workflow_run.name }}
             - Run ID: ${{ github.event.workflow_run.id }}
             - Branch: ${{ github.event.workflow_run.head_branch }}
             - Triggered by: ${{ github.event.workflow_run.event }}
+            - PR number: ${{ github.event.workflow_run.pull_requests[0].number }}
 
-            Please use the mcp__github_ci tools to fetch the failed workflow run logs,
-            identify the root cause of the failure, and post a clear summary with
-            steps to fix it as a comment on the relevant PR or issue (if any).
-            If there is no associated PR, summarize the error in a new issue comment.
+            Steps:
+            1. Run `gh run view ${{ github.event.workflow_run.id }} --log-failed --repo richardshi/claude-tutorial-projects` to get the failure logs.
+            2. Identify the root cause.
+            3. Post a comment on PR #${{ github.event.workflow_run.pull_requests[0].number }} using:
+               `gh pr comment ${{ github.event.workflow_run.pull_requests[0].number }} --repo richardshi/claude-tutorial-projects --body "..."`
+               Include: what failed, why it failed, and concrete steps to fix it.
+            4. If the PR number is 0 or empty, post to a new issue comment instead.
