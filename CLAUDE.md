@@ -12,6 +12,10 @@ This is a monorepo containing multiple independent tutorial/learning projects:
 
 Each project has its own `CLAUDE.md` with project-specific commands, architecture details, and conventions.
 
+## GitHub Actions
+
+See `.github/workflows/` for Claude-powered automation: mention (@claude), PR review, and auto build error check.
+
 ## Git conventions
 
 - `.gitignore` lives at the repo root and prefixes all project-specific paths with their subdirectory (e.g., `uigen/node_modules`).
