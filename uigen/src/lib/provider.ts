@@ -12,6 +12,7 @@ export class MockLanguageModel implements LanguageModelV2 {
   readonly provider = "mock";
   readonly modelId: string;
   readonly defaultObjectGenerationMode = "tool" as const;
+  readonly supportedUrls: Record<string, RegExp[]> = {};
 
   constructor(modelId: string) {
     this.modelId = modelId;
@@ -39,19 +40,6 @@ export class MockLanguageModel implements LanguageModelV2 {
       }
     }
     return "";
-  }
-
-  private getLastToolResult(messages: LanguageModelV2Prompt): any {
-    // Find the last tool message
-    for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].role === "tool") {
-        const content = messages[i].content;
-        if (Array.isArray(content) && content.length > 0) {
-          return content[0];
-        }
-      }
-    }
-    return null;
   }
 
   private async *generateMockStream(
@@ -88,7 +76,7 @@ export class MockLanguageModel implements LanguageModelV2 {
         type: "tool-call",
         toolCallId: `call_1`,
         toolName: "str_replace_editor",
-        args: JSON.stringify({
+        input: JSON.stringify({
           command: "create",
           path: `/components/${componentName}.jsx`,
           file_text: this.getComponentCode(componentType),
@@ -101,6 +89,7 @@ export class MockLanguageModel implements LanguageModelV2 {
         usage: {
           inputTokens: 50,
           outputTokens: 30,
+          totalTokens: 80,
         },
       };
       return;
@@ -120,7 +109,7 @@ export class MockLanguageModel implements LanguageModelV2 {
         type: "tool-call",
         toolCallId: `call_2`,
         toolName: "str_replace_editor",
-        args: JSON.stringify({
+        input: JSON.stringify({
           command: "str_replace",
           path: `/components/${componentName}.jsx`,
           old_str: this.getOldStringForReplace(componentType),
@@ -134,6 +123,7 @@ export class MockLanguageModel implements LanguageModelV2 {
         usage: {
           inputTokens: 50,
           outputTokens: 30,
+          totalTokens: 80,
         },
       };
       return;
@@ -153,7 +143,7 @@ export class MockLanguageModel implements LanguageModelV2 {
         type: "tool-call",
         toolCallId: `call_3`,
         toolName: "str_replace_editor",
-        args: JSON.stringify({
+        input: JSON.stringify({
           command: "create",
           path: "/App.jsx",
           file_text: this.getAppCode(componentName),
@@ -166,6 +156,7 @@ export class MockLanguageModel implements LanguageModelV2 {
         usage: {
           inputTokens: 50,
           outputTokens: 30,
+          totalTokens: 80,
         },
       };
       return;
@@ -193,6 +184,7 @@ The component is now ready to use. You can see the preview on the right side of 
         usage: {
           inputTokens: 50,
           outputTokens: 50,
+          totalTokens: 100,
         },
       };
       return;
@@ -459,7 +451,7 @@ export default function App() {
           type: "tool-call",
           toolCallId: (p as any).toolCallId,
           toolName: (p as any).toolName,
-          args: (p as any).args,
+          input: (p as any).input,
         });
       });
 
@@ -473,6 +465,7 @@ export default function App() {
       usage: {
         inputTokens: 100,
         outputTokens: 200,
+        totalTokens: 300,
       },
       warnings: [],
     };
@@ -500,7 +493,6 @@ export default function App() {
 
     return {
       stream,
-      warnings: [],
     };
   }
 }
