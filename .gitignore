@@ -52,3 +52,11 @@ uigen/prisma/dev.db-journal
 
 # configs
 uigen/.eslintrc.json
+
+
+
+# queries
+queries/node_modules
+queries/post-log.json
+queries/pre-log.json
+queries/.env
