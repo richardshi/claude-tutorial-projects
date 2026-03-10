@@ -239,3 +239,39 @@ export async function findDeliveryDelays(
   const rows: any[] = await db.all(query, [expectedDays]);
   return rows as DeliveryDelay[];
 }
+
+
+
+export async function findDeliveryDelays_2(
+  db: Database,
+  expectedDays: number = 5
+): Promise<DeliveryDelay[]> {
+  const query = `
+    SELECT 
+        o.order_id,
+        o.created_at as order_date,
+        o.status as current_status,
+        CAST((julianday('now') - julianday(o.created_at)) AS INTEGER) as days_since_order,
+        c.email,
+        c.phone,
+        c.segment as customer_segment,
+        sa.city || ', ' || sa.state as destination,
+        GROUP_CONCAT(p.name || ' (x' || oi.quantity || ')', ', ') as products,
+        o.total_amount,
+        w.name as last_known_warehouse
+    FROM orders o
+    JOIN customers c ON o.customer_id = c.customer_id
+    JOIN shipping_addresses sa ON o.shipping_address_id = sa.address_id
+    JOIN order_items oi ON o.order_id = oi.order_id
+    JOIN products p ON oi.product_id = p.product_id
+    LEFT JOIN warehouses w ON o.warehouse_id = w.warehouse_id
+    WHERE o.status NOT IN ('delivered', 'cancelled')
+    AND julianday('now') - julianday(o.created_at) > ?
+    GROUP BY o.order_id, o.created_at, o.status, c.email, c.phone, 
+             c.segment, sa.city, sa.state, o.total_amount, w.name
+    ORDER BY days_since_order DESC
+    `;
+
+  const rows: any[] = await db.all(query, [expectedDays]);
+  return rows as DeliveryDelay[];
+}
